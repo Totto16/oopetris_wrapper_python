@@ -1,6 +1,6 @@
 src_files = files('convert.cpp', 'convert.hpp', 'recordings.cpp')
 
-python_sources = files('__init__.py', 'recordings.pyi')
+python_sources = files('__init__.py', 'recordings.pyi','py.typed')
 
 py.install_sources(
     python_sources,

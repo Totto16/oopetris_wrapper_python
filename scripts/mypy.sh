@@ -2,4 +2,4 @@
 
 set -e
 
-uv run bash -c "mypy src/ tests/ --strict --ignore-missing-imports --warn-unreachable"
+uv run bash -c "mypy src/ tests/ --strict --warn-unreachable"

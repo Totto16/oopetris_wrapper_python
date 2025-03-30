@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 from oopetris import recordings
-from oopetris.recordings import get_information, is_recording_file
+from oopetris.recordings import RecordingInformation, get_information, is_recording_file
 from pytest_subtests import SubTests
 
 
@@ -71,8 +71,7 @@ def test_get_information(subtests: SubTests) -> None:
         assert not get_information(incorrect_file)
 
     with subtests.test("should return a dict, when the file exists and is valid"):
-        # TODO: get correct type and annotate
-        information = get_information(correct_file)
+        information: RecordingInformation = get_information(correct_file)
         assert isinstance(information, dict)
 
 
