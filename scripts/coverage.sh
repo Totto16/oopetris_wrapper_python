@@ -3,4 +3,5 @@
 set -e
 
 uv sync --no-editable --group own --group test
-uv run --no-editable bash -c "coverage run -m pytest tests/ && coverage xml"
+uv run --no-editable coverage run -m pytest tests/
+uv run --no-editable coverage xml
