@@ -129,10 +129,18 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v5
 
+      - name: Install needed packages into virtualenv
+        run: |
+          uv sync --no-editable --all-groups
+
+      - name: Lint and Test files
+        run: |
+          uv run --no-editable ruff check src/ tests/
+          uv run --no-editable mypy src/ tests/
+          uv run --no-editable pytest tests/
+
       - name: Build package
         run: |
-          uv sync --dev
-          uv run pytest tests/
           uv build
 
       - name: Upload artifacts
