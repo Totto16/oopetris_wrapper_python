@@ -1,0 +1,141 @@
+name: Build CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+  workflow_dispatch:
+
+env:
+  oopetris_main_repo_ref: 01236ab59b27e7a8889e48c73ec0361cf2206805
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}-${{ matrix.config.os-version }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: Windows
+            os: windows
+            os-version: 2022
+
+          - name: Linux
+            os: ubuntu
+            os-version: 24.04
+
+          - name: MacOS
+            os: macos
+            os-version: 13
+
+          - name: MacOS (Arm64)
+            os: macos
+            os-version: 14
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - uses: actions/checkout@v4
+        name: Checkout OOPetris main repo
+        with:
+          fetch-depth: '0'
+          repository: OpenBrickProtocolFoundation/oopetris
+          ref: ${{ env.oopetris_main_repo_ref }}
+          path: ./oopetris
+          submodules: false
+
+      - name: Setup MSVC (Windows)
+        if: matrix.config.os == 'windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+          toolset: 14.43
+
+      - name: Setup GCC (Linux)
+        if: matrix.config.os == 'ubuntu'
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 14
+          platform: x64
+
+      - name: Setup Clang (MacOS)
+        if: matrix.config.os == 'macos'
+        run: |
+          brew update
+          # TODO annotate with lld@19, after that is accepted, we don't want to use lld@20 without manually updating it !
+          brew install llvm@19 lld
+          echo "$(brew --prefix)/opt/llvm/bin" >> $GITHUB_PATH
+          echo "LDFLAGS=-L$(brew --prefix)/opt/llvm/lib -L$(brew --prefix)/opt/llvm/lib/c++ -Wl,-rpath,$(brew --prefix)/opt/llvm/lib/c++" >> "$GITHUB_ENV"
+          echo "CPPFLAGS=-I$(brew --prefix)/opt/llvm/include" >> "$GITHUB_ENV"
+          echo "CC=clang" >> "$GITHUB_ENV"
+          echo "CXX=clang++" >> "$GITHUB_ENV"
+          echo "OBJC=clang" >> "$GITHUB_ENV"
+          echo "CC_LD=lld" >> "$GITHUB_ENV"
+          echo "CXX_LD=lld" >> "$GITHUB_ENV"
+          echo "OBJC_LD=lld" >> "$GITHUB_ENV"
+
+      - name: Unbreak Python in GHA (MacOS 13 image)
+        if: matrix.config.os == 'macos' && matrix.config.os-version == 13
+        run: |
+          # TODO: remove this, after it works again
+          # A workaround for "The `brew link` step did not complete successfully" error.
+          # See e.g. https://github.com/Homebrew/homebrew-core/issues/165793#issuecomment-1991817938
+          find /usr/local/bin -lname '*/Library/Frameworks/Python.framework/*' -delete
+          sudo rm -rf /Library/Frameworks/Python.framework/
+          brew install --force python3 && brew unlink python3 && brew unlink python3 && brew link --overwrite python3
+  
+      - name: Setup meson (MacOS)
+        if: matrix.config.os == 'macos'
+        run: |
+          brew update
+          brew install meson
+
+      # NOTE: meson has no dependencies, so --break-system-packages doesn't really break anything!
+      - name: Setup meson
+        if: matrix.config.os != 'macos'
+        run: |
+          pip install meson --break-system-packages
+
+      - name: Install dependencies (Linux)
+        if: matrix.config.os == 'ubuntu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install ninja-build -y --no-install-recommends
+          sudo pip install meson --break-system-packages
+
+      - name: Fix pkg-config (Windows)
+        if: matrix.config.os == 'windows'
+        run: |
+          Remove-Item -Path C:\Strawberry\ -Recurse
+          choco install pkgconfiglite
+          echo "PKG_CONFIG_PATH=C:/lib/pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Build and Install OOPetris
+        run: |
+          cd oopetris
+          meson setup build -Dbuildtype=release -Ddefault_library=static -Dclang_libcpp=${{ matrix.config.os == 'macos' && 'enabled' || 'disabled' }} -Donly_build_libs=true ${{ matrix.config.os == 'windows' && '-Db_vscrt=static_from_buildtype' || '' }}
+          ${{ matrix.config.os == 'ubuntu' && 'sudo' || '' }} meson install -C build
+          ${{ matrix.config.os == 'ubuntu' && 'sudo ldconfig' || '' }}
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Build package
+        run: |
+          uv sync --dev
+          uv run pytest tests/
+          uv build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.config.name }} Ptyhon Wrapper
+          path:  | 
+            dist/oopetris-*.tar.gz
+            dist/oopetris-*.whl
