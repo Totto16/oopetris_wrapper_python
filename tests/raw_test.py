@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import pytest
 from oopetris import recordings
 from oopetris.recordings import get_information, is_recording_file
+
+import pytest
 from pytest_subtests import SubTests
 
 if TYPE_CHECKING:

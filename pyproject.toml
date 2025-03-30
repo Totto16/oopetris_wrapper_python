@@ -76,6 +76,19 @@ per-file-ignores = { "tests/**/*.py" = [
     "E402", # Ignore `E402` (import violations) in all `__init__.py` files
 ] }
 
+[tool.ruff.lint.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "first-party",
+    "oopetris-section",
+    "local-folder",
+    "third-party",
+]
+
+[tool.ruff.lint.isort.sections]
+"oopetris-section" = ["oopetris", "oopetris.*"]
+
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
