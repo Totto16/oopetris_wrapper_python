@@ -78,5 +78,5 @@ def test_get_information(subtests: SubTests) -> None:
     ):
         assert correct_file.exists()
 
-        information: RecordingInformation = get_information(correct_file)
-        assert information == correct_information
+        new_information: RecordingInformation = get_information(correct_file)
+        assert new_information == correct_information
