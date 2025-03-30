@@ -2,6 +2,8 @@
 requires = ["meson-python", "pybind11"]
 build-backend = "mesonpy"
 
+[tool.meson-python.args]
+install = ['--tags=runtime,python-runtime']
 
 [project]
 name = 'oopetris'
@@ -12,7 +14,7 @@ requires-python = '>=3.9'
 dependencies = ["pybind11>=2.13.6"]
 
 [project.entry-points.'oopetris.plugins']
-oopetris = "oopetris"
+recordings = "oopetris.recordings"
 
 
 [dependency-groups]

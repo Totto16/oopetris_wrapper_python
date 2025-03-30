@@ -1,11 +1,11 @@
 import os
+from pathlib import Path
 from typing import Any
 
-import oopetris
 import pytest
-from oopetris import get_information, is_recording_file
+from oopetris import recordings
+from oopetris.recordings import get_information, is_recording_file
 from pytest_subtests import SubTests
-from pathlib import Path
 
 
 def get_file_path(name: str) -> Path:
@@ -71,13 +71,13 @@ def test_get_information(subtests: SubTests) -> None:
         assert not get_information(incorrect_file)
 
     with subtests.test("should return a dict, when the file exists and is valid"):
-        # TODO: get correct tyope and annotate
+        # TODO: get correct type and annotate
         information = get_information(correct_file)
         assert isinstance(information, dict)
 
 
 def test_properties(subtests: SubTests) -> None:
-    raw_properties: list[str] = dir(oopetris)
+    raw_properties: list[str] = dir(recordings)
     properties: list[str] = sorted(
         prop for prop in raw_properties if not prop.startswith("__")
     )
@@ -109,4 +109,4 @@ def test_properties(subtests: SubTests) -> None:
             if callable(expected_value):
                 pass
             else:
-                assert getattr(oopetris, key) == expected_value
+                assert getattr(recordings, key) == expected_value
