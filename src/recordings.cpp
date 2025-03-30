@@ -65,7 +65,8 @@ pybind11::dict get_information(PathLike path) {
     if (not parsed.has_value()) {
 
         std::string error = "An error occurred during parsing of the recording file '";
-        error += resolved_path;
+        //TODO: use wstring on windows! 
+        error += resolved_path.generic_string();
         error += "': ";
         error += parsed.error();
 
@@ -120,7 +121,7 @@ PYBIND11_MODULE(recordings, module) {
         } catch (const FileNotFoundError& err) {
 
             std::string error = "File '";
-            error += err.file();
+            error += err.file().generic_string();
             error += "' doesn't exist!";
 
             PyErr_SetObject(PyExc_FileNotFoundError, pybind11::str(error).ptr());
