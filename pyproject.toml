@@ -18,7 +18,7 @@ recordings = "oopetris.recordings"
 
 
 [dependency-groups]
-dev = ["black>=25.1.0", "flake8>=7.2.0", "meson>=1.7.0"]
+dev = ["black>=25.1.0", "flake8>=7.2.0", "isort>=6.0.1", "meson>=1.7.0"]
 lint = ["mypy>=1.15.0", "ruff>=0.11.2"]
 test = ["pytest>=8.3.5", "pytest-cov>=6.0.0", "pytest-subtests>=0.14.1"]
 own = ["oopetris"]

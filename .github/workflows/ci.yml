@@ -135,7 +135,7 @@ jobs:
 
       - name: Lint and Test files
         run: |
-          uv run --no-editable ruff check src/ tests/
+          uv run --no-editable ruff check --output-format github src/ tests/
           uv run --no-editable mypy src/ tests/
           uv run --no-editable pytest tests/
 
