@@ -36,8 +36,8 @@ def test_is_recording_file(subtests: SubTests) -> None:
         assert not is_recording_file(str(file))
 
     with subtests.test("should return false, when the file doesn't exist"):
-        incorrect_file: Path = get_file_path("NON-EXISTENT.rec")
-        assert not is_recording_file(incorrect_file)
+        non_existent_file: Path = get_file_path("NON-EXISTENT.rec")
+        assert not is_recording_file(non_existent_file)
 
     with subtests.test("should return true, when the file exists and is valid"):
         correct_file: Path = get_file_path("correct.rec")
@@ -63,7 +63,7 @@ def test_get_information(subtests: SubTests) -> None:
         get_information(correct_file)
         get_information(str(correct_file))
 
-    incorrect_file: Path = get_file_path("NON-EXISTENT.rec")
+    non_existent_file: Path = get_file_path("NON-EXISTENT.rec")
 
     with (
         subtests.test("should raise an error, when the file doesn't exist"),
@@ -72,7 +72,7 @@ def test_get_information(subtests: SubTests) -> None:
             match=r"^File '.*NON-EXISTENT.rec' doesn't exist!$",
         ),
     ):
-        assert not get_information(incorrect_file)
+        assert not get_information(non_existent_file)
 
     with subtests.test("should return a dict, when the file exists and is valid"):
         information: RecordingInformation = get_information(correct_file)
