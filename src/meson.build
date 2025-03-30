@@ -1,3 +1,5 @@
 src_files += files(
-    'wrapper.cpp',
+    'convert.cpp',
+    'convert.hpp',
+    'wrapper.cpp'
 )

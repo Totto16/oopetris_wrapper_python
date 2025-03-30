@@ -1,3 +1,114 @@
 [build-system]
 requires = ["meson-python", "pybind11"]
 build-backend = "mesonpy"
+
+
+[project]
+name = 'oopetris'
+version = '0.5.6'
+description = 'The OOPetris python wrapper'
+readme = 'README.md'
+requires-python = '>=3.9'
+dependencies = ["pybind11>=2.13.6"]
+
+[project.entry-points.'oopetris.plugins']
+oopetris = "oopetris"
+
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "flake8>=7.2.0",
+    "mypy>=1.15.0",
+    "pylint>=3.3.6",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "pytest-subtests>=0.14.1",
+    "ruff>=0.11.2",
+]
+
+
+[tool.pytest.ini_options]
+enable_assertion_pass_hook = true
+pythonpath = "src"
+testpaths = ["tests"]
+
+
+[tool.ruff]
+
+# Exclude directories.
+exclude = []
+
+# 88 (standard) is to small
+line-length = 100
+indent-width = 4
+
+target-version = "py312"
+
+[tool.ruff.lint]
+
+select = ["ALL"]
+
+ignore = [
+    "E501", # => line length violations
+    "D",    # pydocstyle => I don't use doc strings atm. 
+    #TODO
+    # "PLR2004", # => magic-value-comparison 
+    # "PLR0913", # => too-many-arguments
+    # "PLR0911", # => too-many-return-statements
+    # "PLR0912", # => too-many-branches 
+    # "UP007",   # => non-pep604-annotation  (Union[a,b] => a|b is fine, but i like Optional[a] better then a|None)
+    # "ANN401",  # => any-type 
+    # "C90",     # mccabe => complexity isn't of concern atm.
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+per-file-ignores = { "tests/**/*.py" = [
+    "S101", # ignore "S101" (no asserts) for all files in tests/
+], "src/*.py" = [
+    "INP001", # ignore "INP001" (implicit namespace package) for all (direct) files in src/
+], "tests/*.py" = [
+    "INP001", # ignore "INP001" (implicit namespace package) for all (direct) files in tests/
+], "__init__.py" = [
+    "E402", # Ignore `E402` (import violations) in all `__init__.py` files
+] }
+
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+
+[tool.coverage.run]
+relative_files = true
+source = ["src/"]
