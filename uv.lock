@@ -222,6 +222,15 @@ wheels = [
 ]
 
 [[package]]
+name = "meson"
+version = "1.7.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/02/98/bbcaf6caaaa0510a68834f119ac793a8abade6ff827fc2791eeb6f8b4a66/meson-1.7.0.tar.gz", hash = "sha256:08efbe84803eed07f863b05092d653a9d348f7038761d900412fddf56deb0284", size = 2293975 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ab/3b/63fdad828b4cbeb49cef3aad26f3edfbc72f37a0ab54917d445ec0b9d9ff/meson-1.7.0-py3-none-any.whl", hash = "sha256:ae3f12953045f3c7c60e27f2af1ad862f14dee125b4ed9bcb8a842a5080dbf85", size = 990540 },
+]
+
+[[package]]
 name = "mypy"
 version = "1.15.0"
 source = { registry = "https://pypi.org/simple" }
@@ -286,6 +295,7 @@ dependencies = [
 dev = [
     { name = "black" },
     { name = "flake8" },
+    { name = "meson" },
     { name = "mypy" },
     { name = "pylint" },
     { name = "pytest" },
@@ -301,6 +311,7 @@ requires-dist = [{ name = "pybind11", specifier = ">=2.13.6" }]
 dev = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "flake8", specifier = ">=7.2.0" },
+    { name = "meson", specifier = ">=1.7.0" },
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pylint", specifier = ">=3.3.6" },
     { name = "pytest", specifier = ">=8.3.5" },
