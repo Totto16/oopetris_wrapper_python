@@ -1,50 +1,71 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <core/core.hpp>
 #include <recordings/recordings.hpp>
 
 #include "./convert.hpp"
 
-bool is_recording_file(std::string path) {
+#include <filesystem>
+#include <variant>
 
-    if (not std::filesystem::exists(path)) {
+
+using PathLike = std::variant<std::string, std::filesystem::path>;
+
+
+static std::filesystem::path resolve_path_like(PathLike path) {
+    return std::visit(
+            helper::Overloaded{
+                    [](const std::string& value) -> std::filesystem::path { return std::filesystem::path{ value }; },
+                    [](const std::filesystem::path& value) -> std::filesystem::path { return (value); },
+            },
+            path
+    );
+}
+
+bool is_recording_file(PathLike path) {
+
+    const std::filesystem::path resolved_path = resolve_path_like(path);
+
+    if (not std::filesystem::exists(resolved_path)) {
 
         return false;
     }
 
-    auto parsed = recorder::RecordingReader::from_path(path);
+    auto parsed = recorder::RecordingReader::from_path(resolved_path);
 
     return parsed.has_value();
 }
 
 class FileNotFoundError : public std::runtime_error {
-    std::string m_file;
+    std::filesystem::path m_file;
 
 public:
-    explicit FileNotFoundError(std::string file)
+    explicit FileNotFoundError(std::filesystem::path file)
         : std::runtime_error{ "File Not Found Exception" },
           m_file{ std::move(file) } { }
 
-    [[nodiscard]] std::string file() const {
+    [[nodiscard]] std::filesystem::path file() const {
         return m_file;
     }
 };
 
 
-pybind11::dict get_information(std::string path) {
+pybind11::dict get_information(PathLike path) {
 
+    const std::filesystem::path resolved_path = resolve_path_like(path);
 
-    if (not std::filesystem::exists(path)) {
-        throw FileNotFoundError(path);
+    if (not std::filesystem::exists(resolved_path)) {
+        throw FileNotFoundError(resolved_path);
     }
 
-    auto parsed = recorder::RecordingReader::from_path(path);
+    auto parsed = recorder::RecordingReader::from_path(resolved_path);
 
     if (not parsed.has_value()) {
 
         std::string error = "An error occurred during parsing of the recording file '";
-        error += path;
+        error += resolved_path;
         error += "': ";
         error += parsed.error();
 

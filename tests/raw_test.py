@@ -1,14 +1,16 @@
-from typing import Any, Callable
-import pytest
-from oopetris import version, is_recording_file, get_information
-import oopetris
-from pytest_subtests import SubTests
 import os
+from typing import Any
+
+import oopetris
+import pytest
+from oopetris import get_information, is_recording_file
+from pytest_subtests import SubTests
+from pathlib import Path
 
 
-def get_file_path(name: str) -> str:
-    dir_path: str = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(dir_path, "files", name)
+def get_file_path(name: str) -> Path:
+    dir_path: Path = Path(os.path.realpath(__file__)).parent
+    return dir_path / "files" / name
 
 
 def test_is_recording_file(subtests: SubTests) -> None:
@@ -24,13 +26,18 @@ def test_is_recording_file(subtests: SubTests) -> None:
     ):
         is_recording_file(1)
 
-    with subtests.test("should return false, when the file doesn't exist"):
-        file = get_file_path("NON-EXISTENT.rec")
+    with subtests.test("should accept 'string' and 'pathlib.Path' as argument"):
+        file: Path = get_file_path("NON-EXISTENT.rec")
         assert not is_recording_file(file)
+        assert not is_recording_file(str(file))
+
+    with subtests.test("should return false, when the file doesn't exist"):
+        incorrect_file: Path = get_file_path("NON-EXISTENT.rec")
+        assert not is_recording_file(incorrect_file)
 
     with subtests.test("should return true, when the file exists and is valid"):
-        file = get_file_path("correct.rec")
-        assert is_recording_file(file)
+        correct_file: Path = get_file_path("correct.rec")
+        assert is_recording_file(correct_file)
 
 
 def test_get_information(subtests: SubTests) -> None:
@@ -46,55 +53,60 @@ def test_get_information(subtests: SubTests) -> None:
     ):
         get_information(1)
 
+    correct_file: Path = get_file_path(name="correct.rec")
+
+    with subtests.test("should accept 'string' and 'pathlib.Path' as argument"):
+        get_information(correct_file)
+        get_information(str(correct_file))
+
+    incorrect_file: Path = get_file_path("NON-EXISTENT.rec")
+
     with (
         subtests.test("should raise an error, when the file doesn't exist"),
-        pytest.raises(FileNotFoundError, match=r"^File '.*NON-EXISTENT.rec' doesn't exist!$"),
+        pytest.raises(
+            FileNotFoundError,
+            match=r"^File '.*NON-EXISTENT.rec' doesn't exist!$",
+        ),
     ):
-        file = get_file_path("NON-EXISTENT.rec")
-        assert not get_information(file)
+        assert not get_information(incorrect_file)
 
     with subtests.test("should return a dict, when the file exists and is valid"):
-        file = get_file_path("correct.rec")
-        information = get_information(file)
+        # TODO: get correct tyope and annotate
+        information = get_information(correct_file)
         assert isinstance(information, dict)
 
 
 def test_properties(subtests: SubTests) -> None:
+    raw_properties: list[str] = dir(oopetris)
+    properties: list[str] = sorted(
+        prop for prop in raw_properties if not prop.startswith("__")
+    )
+
     with subtests.test("should only have known properties"):
-        expected_properties = sorted(
+        expected_properties_list: list[str] = sorted(
             [
                 "is_recording_file",
                 "get_information",
                 "version",
                 "properties",
-            ]
+            ],
         )
 
-        raw_properties = dir(oopetris)
-        properties = sorted(
-            prop for prop in raw_properties if not prop.startswith("__")
-        )
-
-        assert properties == expected_properties
+        assert properties == expected_properties_list
 
     with subtests.test("should have the expected properties"):
-        expected_properties: dict[str, Any] = {
+        expected_properties_dict: dict[str, Any] = {
             "is_recording_file": lambda *_a: None,
             "get_information": lambda *_a: None,
             "version": "0.5.6",
             "properties": {"grid_properties": {"height": 20, "width": 10}},
         }
 
-        raw_properties = dir(oopetris)
-        properties = sorted(
-            prop for prop in raw_properties if not prop.startswith("__")
-        )
-
         for key in properties:
-            assert expected_properties.get(key, None) is not None
-            expected_value = expected_properties[key]
+            assert expected_properties_dict.get(key) is not None
+            expected_value = expected_properties_dict[key]
 
-            if isinstance(expected_value, Callable):
+            if callable(expected_value):
                 pass
             else:
                 assert getattr(oopetris, key) == expected_value

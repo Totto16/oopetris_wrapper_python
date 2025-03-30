@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal, TypedDict
 
 # types
@@ -74,10 +75,12 @@ class GridProperties(TypedDict):
 class RecordingsProperties(TypedDict):
     grid_properties: GridProperties
 
+type PathLike = Path | str
+
 # actual functions
 
-def is_recording_file(path: str) -> bool: ...
-def get_information(path: str) -> RecordingInformation: ...
+def is_recording_file(path: PathLike) -> bool: ...
+def get_information(path: PathLike) -> RecordingInformation: ...
 
 properties: RecordingsProperties
 
