@@ -79,7 +79,7 @@ const char* event_to_string(InputEvent event) {
 }
 
 static inline pybind11::str event_to_python_string(InputEvent event) {
-    pybind11::str(event_to_string(event));
+    return pybind11::str(event_to_string(event));
 }
 
 

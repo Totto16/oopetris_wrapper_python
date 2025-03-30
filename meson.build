@@ -8,7 +8,7 @@ project(
         'strip': true,
         'cpp_std': ['c++23', 'c++latest', 'vc++latest', 'c++20'],
         'b_ndebug': 'if-release',
-
+        'werror': true
     },
     version: '0.5.6',
 )

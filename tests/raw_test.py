@@ -48,7 +48,7 @@ def test_get_information(subtests: SubTests) -> None:
 
     with (
         subtests.test("should raise an error, when the file doesn't exist"),
-        pytest.raises(TypeError, match=r"^a$"),
+        pytest.raises(FileNotFoundError, match=r"^File '.*NON-EXISTENT.rec' doesn't exist!$"),
     ):
         file = get_file_path("NON-EXISTENT.rec")
         assert not get_information(file)
