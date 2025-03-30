@@ -1,11 +1,14 @@
 import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from oopetris import recordings
-from oopetris.recordings import RecordingInformation, get_information, is_recording_file
+from oopetris.recordings import get_information, is_recording_file
 from pytest_subtests import SubTests
+
+if TYPE_CHECKING:
+    from oopetris.recordings import RecordingInformation
 
 
 def get_file_path(name: str) -> Path:
@@ -18,13 +21,13 @@ def test_is_recording_file(subtests: SubTests) -> None:
         subtests.test("should raise an error, when no first argument was given"),
         pytest.raises(TypeError),
     ):
-        is_recording_file()
+        is_recording_file()  # type: ignore[call-arg]
 
     with (
         subtests.test("should raise an error, when the first argument is not a string"),
         pytest.raises(TypeError),
     ):
-        is_recording_file(1)
+        is_recording_file(1)  # type: ignore[arg-type]
 
     with subtests.test("should accept 'string' and 'pathlib.Path' as argument"):
         file: Path = get_file_path("NON-EXISTENT.rec")
@@ -45,13 +48,13 @@ def test_get_information(subtests: SubTests) -> None:
         subtests.test("should raise an error, when no first argument was given"),
         pytest.raises(TypeError),
     ):
-        get_information()
+        get_information()  # type: ignore[call-arg]
 
     with (
         subtests.test("should raise an error, when the first argument is not a string"),
         pytest.raises(TypeError),
     ):
-        get_information(1)
+        get_information(1)  # type: ignore[arg-type]
 
     correct_file: Path = get_file_path(name="correct.rec")
 

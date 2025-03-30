@@ -18,17 +18,10 @@ recordings = "oopetris.recordings"
 
 
 [dependency-groups]
-dev = [
-    "black>=25.1.0",
-    "flake8>=7.2.0",
-    "meson>=1.7.0",
-    "mypy>=1.15.0",
-    "pylint>=3.3.6",
-    "pytest>=8.3.5",
-    "pytest-cov>=6.0.0",
-    "pytest-subtests>=0.14.1",
-    "ruff>=0.11.2",
-]
+dev = ["black>=25.1.0", "flake8>=7.2.0", "meson>=1.7.0"]
+lint = ["mypy>=1.15.0", "ruff>=0.11.2"]
+test = ["pytest>=8.3.5", "pytest-cov>=6.0.0", "pytest-subtests>=0.14.1"]
+own = ["oopetris"]
 
 
 [tool.pytest.ini_options]
@@ -115,3 +108,14 @@ docstring-code-line-length = "dynamic"
 [tool.coverage.run]
 relative_files = true
 source = ["src/"]
+
+[tool.mypy]
+strict = true
+warn_unreachable = true
+ignore_missing_imports = false
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.sources]
+oopetris = { workspace = true }

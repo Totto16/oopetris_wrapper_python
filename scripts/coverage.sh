@@ -2,4 +2,5 @@
 
 set -e
 
-uv run "bash -c 'coverage run -m pytest tests/ && coverage xml'"
+uv sync --no-editable --group own --group test
+uv run --no-editable bash -c "coverage run -m pytest tests/ && coverage xml"
