@@ -136,7 +136,7 @@ jobs:
 
       - name: Install needed packages into virtualenv
         run: |
-          uv sync --no-editable --all-groups
+          uv sync --no-editable --all-groups ${{ matrix.config.os == 'windows' && '--config-setting "setup-args=-Db_vscrt=static_from_buildtype"' || '' }}
 
       - name: Lint and Test files
         run: |
@@ -146,7 +146,7 @@ jobs:
 
       - name: Build package
         run: |
-          uv build
+          uv build ${{ matrix.config.os == 'windows' && '--config-setting "setup-args=-Db_vscrt=static_from_buildtype"' || '' }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
