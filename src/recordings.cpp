@@ -65,7 +65,8 @@ pybind11::dict get_information(PathLike path) {
     if (not parsed.has_value()) {
 
         std::string error = "An error occurred during parsing of the recording file '";
-        error += resolved_path;
+        //TODO: use wstring on windows! 
+        error += resolved_path.generic_string();
         error += "': ";
         error += parsed.error();
 
@@ -80,8 +81,8 @@ pybind11::dict get_information(PathLike path) {
     return val;
 }
 
-PYBIND11_MODULE(oopetris, module) {
-    module.doc() = "oopetris wrapper plugin"; // optional module docstring
+PYBIND11_MODULE(recordings, module) {
+    module.doc() = "oopetris recordings wrapper plugin"; // optional module docstring
 
     module.def("is_recording_file", &is_recording_file, "Checks if a file is a recording file", pybind11::arg("path"));
 
@@ -120,7 +121,7 @@ PYBIND11_MODULE(oopetris, module) {
         } catch (const FileNotFoundError& err) {
 
             std::string error = "File '";
-            error += err.file();
+            error += err.file().generic_string();
             error += "' doesn't exist!";
 
             PyErr_SetObject(PyExc_FileNotFoundError, pybind11::str(error).ptr());

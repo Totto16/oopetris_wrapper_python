@@ -2,4 +2,5 @@
 
 set -e
 
-uv run bash -c "mypy src/ tests/ --strict --ignore-missing-imports --warn-unreachable"
+uv sync --no-editable --group lint --group own --group test
+uv run --no-editable mypy src/ tests/

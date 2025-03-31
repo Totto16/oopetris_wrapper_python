@@ -2,6 +2,8 @@
 requires = ["meson-python", "pybind11"]
 build-backend = "mesonpy"
 
+[tool.meson-python.args]
+install = ['--tags=runtime,python-runtime']
 
 [project]
 name = 'oopetris'
@@ -12,21 +14,14 @@ requires-python = '>=3.9'
 dependencies = ["pybind11>=2.13.6"]
 
 [project.entry-points.'oopetris.plugins']
-oopetris = "oopetris"
+recordings = "oopetris.recordings"
 
 
 [dependency-groups]
-dev = [
-    "black>=25.1.0",
-    "flake8>=7.2.0",
-    "meson>=1.7.0",
-    "mypy>=1.15.0",
-    "pylint>=3.3.6",
-    "pytest>=8.3.5",
-    "pytest-cov>=6.0.0",
-    "pytest-subtests>=0.14.1",
-    "ruff>=0.11.2",
-]
+dev = ["black>=25.1.0", "flake8>=7.2.0", "isort>=6.0.1", "meson>=1.7.0"]
+lint = ["mypy>=1.15.0", "ruff>=0.11.2"]
+test = ["pytest>=8.3.5", "pytest-cov>=6.0.0", "pytest-subtests>=0.14.1"]
+own = ["oopetris"]
 
 
 [tool.pytest.ini_options]
@@ -81,6 +76,19 @@ per-file-ignores = { "tests/**/*.py" = [
     "E402", # Ignore `E402` (import violations) in all `__init__.py` files
 ] }
 
+[tool.ruff.lint.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "first-party",
+    "oopetris-section",
+    "local-folder",
+    "third-party",
+]
+
+[tool.ruff.lint.isort.sections]
+"oopetris-section" = ["oopetris", "oopetris.*"]
+
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -113,3 +121,14 @@ docstring-code-line-length = "dynamic"
 [tool.coverage.run]
 relative_files = true
 source = ["src/"]
+
+[tool.mypy]
+strict = true
+warn_unreachable = true
+ignore_missing_imports = false
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.sources]
+oopetris = { workspace = true }

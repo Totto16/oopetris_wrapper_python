@@ -8,7 +8,7 @@ project(
         'strip': true,
         'cpp_std': ['c++23', 'c++latest', 'vc++latest', 'c++20'],
         'b_ndebug': 'if-release',
-        'werror': true
+        'werror': true,
     },
     version: '0.5.6',
 )
@@ -20,8 +20,5 @@ deps += dependency('oopetris-recordings')
 py = import('python').find_installation(pure: false)
 deps += dependency('pybind11')
 
-src_files = []
-
 subdir('src')
 
-oopetris_python_wrapper_module = py.extension_module('oopetris', src_files, install: true, dependencies: deps)

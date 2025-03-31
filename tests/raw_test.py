@@ -1,11 +1,15 @@
 import os
-from typing import Any
-
-import oopetris
-import pytest
-from oopetris import get_information, is_recording_file
-from pytest_subtests import SubTests
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+from oopetris import recordings
+from oopetris.recordings import get_information, is_recording_file
+
+import pytest
+from pytest_subtests import SubTests
+
+if TYPE_CHECKING:
+    from oopetris.recordings import RecordingInformation
 
 
 def get_file_path(name: str) -> Path:
@@ -18,13 +22,13 @@ def test_is_recording_file(subtests: SubTests) -> None:
         subtests.test("should raise an error, when no first argument was given"),
         pytest.raises(TypeError),
     ):
-        is_recording_file()
+        is_recording_file()  # type: ignore[call-arg]
 
     with (
         subtests.test("should raise an error, when the first argument is not a string"),
         pytest.raises(TypeError),
     ):
-        is_recording_file(1)
+        is_recording_file(1)  # type: ignore[arg-type]
 
     with subtests.test("should accept 'string' and 'pathlib.Path' as argument"):
         file: Path = get_file_path("NON-EXISTENT.rec")
@@ -32,8 +36,8 @@ def test_is_recording_file(subtests: SubTests) -> None:
         assert not is_recording_file(str(file))
 
     with subtests.test("should return false, when the file doesn't exist"):
-        incorrect_file: Path = get_file_path("NON-EXISTENT.rec")
-        assert not is_recording_file(incorrect_file)
+        non_existent_file: Path = get_file_path("NON-EXISTENT.rec")
+        assert not is_recording_file(non_existent_file)
 
     with subtests.test("should return true, when the file exists and is valid"):
         correct_file: Path = get_file_path("correct.rec")
@@ -45,13 +49,13 @@ def test_get_information(subtests: SubTests) -> None:
         subtests.test("should raise an error, when no first argument was given"),
         pytest.raises(TypeError),
     ):
-        get_information()
+        get_information()  # type: ignore[call-arg]
 
     with (
         subtests.test("should raise an error, when the first argument is not a string"),
         pytest.raises(TypeError),
     ):
-        get_information(1)
+        get_information(1)  # type: ignore[arg-type]
 
     correct_file: Path = get_file_path(name="correct.rec")
 
@@ -59,7 +63,7 @@ def test_get_information(subtests: SubTests) -> None:
         get_information(correct_file)
         get_information(str(correct_file))
 
-    incorrect_file: Path = get_file_path("NON-EXISTENT.rec")
+    non_existent_file: Path = get_file_path("NON-EXISTENT.rec")
 
     with (
         subtests.test("should raise an error, when the file doesn't exist"),
@@ -68,16 +72,15 @@ def test_get_information(subtests: SubTests) -> None:
             match=r"^File '.*NON-EXISTENT.rec' doesn't exist!$",
         ),
     ):
-        assert not get_information(incorrect_file)
+        assert not get_information(non_existent_file)
 
     with subtests.test("should return a dict, when the file exists and is valid"):
-        # TODO: get correct tyope and annotate
-        information = get_information(correct_file)
+        information: RecordingInformation = get_information(correct_file)
         assert isinstance(information, dict)
 
 
 def test_properties(subtests: SubTests) -> None:
-    raw_properties: list[str] = dir(oopetris)
+    raw_properties: list[str] = dir(recordings)
     properties: list[str] = sorted(
         prop for prop in raw_properties if not prop.startswith("__")
     )
@@ -109,4 +112,4 @@ def test_properties(subtests: SubTests) -> None:
             if callable(expected_value):
                 pass
             else:
-                assert getattr(oopetris, key) == expected_value
+                assert getattr(recordings, key) == expected_value

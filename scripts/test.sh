@@ -2,4 +2,5 @@
 
 set -e
 
-uv run bash -c "pytest tests/"
+uv sync --no-editable --group own --group test
+uv run --no-editable pytest tests/
