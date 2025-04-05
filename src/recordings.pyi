@@ -12,7 +12,7 @@ type U8 = int
 # custom types
 
 type AdditionalInformationValue = (
-    str | U8 | U32 | U64 | bool | list[AdditionalInformationValue]
+    str | float | int | bool | list[AdditionalInformationValue]
 )
 
 type AdditionalInformation = dict[str, AdditionalInformationValue]
@@ -62,7 +62,7 @@ class TetrionHeader(TypedDict):
     starting_level: U32
 
 class RecordingInformation(TypedDict):
-    information: list[AdditionalInformation]
+    information: AdditionalInformation
     records: list[TetrionRecord]
     snapshots: list[TetrionSnapshot]
     tetrion_headers: list[TetrionHeader]
